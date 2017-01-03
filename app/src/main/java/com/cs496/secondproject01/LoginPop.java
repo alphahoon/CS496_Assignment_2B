@@ -97,20 +97,12 @@ public class LoginPop extends Activity {
                                 JSONObject result = new JSONObject();
 
                                 try {
-                                    // Send Device Contact
-                                    JSONArray deviceContacts = getDeviceContacts();
-                                    obj = new JSONObject();
-                                    obj.put("type", "ADD_CONTACTS");
-                                    obj.put("user_id", App.db_user_id);
-                                    obj.put("contacts", deviceContacts);
-                                    new sendJSON("http://52.78.200.87:3000",
-                                            obj.toString(), "application/json").execute();
-
+                                    
                                     // Create new Database for this user
+                                    obj = new JSONObject();
                                     obj.put("type", "NEW_USER");
                                     obj.put("name", user.getString("name"));
                                     obj.put("email", user.getString("email"));
-                                    //App.userFBinfo = user;
                                     result = new sendJSON("http://52.78.200.87:3000",
                                             obj.toString(), "application/json").execute().get();
                                     if (result.getString("result").contains("success")) {
@@ -120,6 +112,15 @@ public class LoginPop extends Activity {
                                         editor.putString("db_id", App.db_user_id);
                                         editor.commit();
                                     }
+
+                                    // Send Device Contact
+                                    JSONArray deviceContacts = getDeviceContacts();
+                                    obj = new JSONObject();
+                                    obj.put("type", "ADD_CONTACTS");
+                                    obj.put("user_id", App.db_user_id);
+                                    obj.put("contacts", deviceContacts);
+                                    new sendJSON("http://52.78.200.87:3000",
+                                            obj.toString(), "application/json").execute();
 
                                     // Send Facebook Contact
                                     sendFBcontacts(user.getJSONObject("taggable_friends"));
