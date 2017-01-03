@@ -2,6 +2,8 @@ package com.cs496.secondproject01;
 
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -10,9 +12,11 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 
 public class MainActivity extends AppCompatActivity {
@@ -37,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        LoginManager.getInstance().logOut();
+        //LoginManager.getInstance().logOut();
+
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
@@ -57,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.getTabAt(0).setIcon(R.drawable.ic_friend);
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_photos);
         tabLayout.getTabAt(2).setIcon(R.drawable.ic_crown);
-        //tabLayout.
     }
 
 
@@ -134,5 +138,9 @@ public class MainActivity extends AppCompatActivity {
             }
             return null;
         }
+    }
+    public boolean isLoggedIn() {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        return accessToken != null;
     }
 }

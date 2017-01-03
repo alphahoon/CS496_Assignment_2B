@@ -247,7 +247,7 @@ public class AddBoxPop extends Activity {
                     JSONObject result = new sendJSON("http://52.78.200.87:3000",
                             req.toString(), "application/json").execute().get();
                     //Log.v("Sent Image", result.toString());
-                    Log.v("db_user_id", App.db_user_id);
+                    //Log.v("db_user_id", App.db_user_id);
                     photos.put(result.getString("img_id"));
                     //selectedPhotos.set(i,result.getString("img_id"));
                     Log.v("photo ids", selectedPhotos.toString());
@@ -298,7 +298,7 @@ public class AddBoxPop extends Activity {
                 activity.put("sports",bool2int(b_ex.isChecked()));
                 activity.put("game",bool2int(b_game.isChecked()));
                 activity.put("travel",bool2int(b_travel.isChecked()));
-                //activity.put("movie",bool2int(b_movie.isChecked()));
+                activity.put("movie",bool2int(b_movie.isChecked()));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -316,7 +316,7 @@ public class AddBoxPop extends Activity {
                 JSONObject result = new sendJSON("http://52.78.200.87:3000",
                         req.toString(), "application/json").execute().get();
                 Log.v("create album", result.toString());
-                if (result.getString("result") == "success") {
+                if (result.getString("result").contains("success")) {
                     Toast.makeText(getApplicationContext(), "추가 완료:)", Toast.LENGTH_SHORT).show();
                     onCreate(null);
                 } else {

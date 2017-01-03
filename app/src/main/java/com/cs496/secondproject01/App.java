@@ -41,7 +41,7 @@ public class App extends Application {
     public void onCreate() {
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
-        LoginManager.getInstance().logOut();
+        //LoginManager.getInstance().logOut();
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitNetwork().build());
         myFont = Typeface.createFromAsset(getAssets(), "fonts/pen.ttf");
         super.onCreate();
@@ -49,6 +49,7 @@ public class App extends Application {
         names = new String[3000];
         friend_map =  new HashMap<String, String>();
         response = "";
+
         /*
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         if (!prefs.getBoolean("firstTime", false)) {

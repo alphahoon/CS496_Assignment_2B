@@ -2,6 +2,7 @@ package com.cs496.secondproject01;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,10 +46,13 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 import static android.R.attr.name;
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.MODE_PRIVATE;
 import static com.cs496.secondproject01.R.id.container;
 
 
@@ -56,8 +61,9 @@ public class tab1contacts extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        JSONArray contactsjson = new JSONArray();
+
         View view = inflater.inflate(R.layout.tab1contacts, container, false);
+
         //LoginManager.getInstance().logOut();
 /*
         FloatingActionButton fb = (FloatingActionButton) view.findViewById(R.id.fab);
@@ -70,26 +76,56 @@ public class tab1contacts extends Fragment {
             }
         });
 */
-        //if (!isLoggedIn() && App.firstAccess) {
-        //if (!isLoggedIn()) {
-        if (true) {
+
+        if (!isLoggedIn()) {
+            //if (true) {
             //LoginButton loginButton = (LoginButton) view.findViewById(R.id.login_button);
             //loginButton.setVisibility(View.INVISIBLE);
             //App.firstAccess = false;
             Intent popupIntent = new Intent(getActivity(), LoginPop.class);
             startActivity(popupIntent);
+        } else {
+            SharedPreferences settings = getActivity().getSharedPreferences("DB",MODE_PRIVATE);
+            App.db_user_id = settings.getString("db_id", "no info");
+            if (App.friends == null) {
+                try {
+                    JSONObject obj = new JSONObject();
+                    JSONObject result = new JSONObject();
+                    obj = new JSONObject();
+                    obj.put("type", "GET_CONTACTS");
+                    obj.put("user_id", App.db_user_id);
+                    result = new sendJSON("http://52.78.200.87:3000",
+                            obj.toString(), "application/json").execute().get();
+
+                    //Update Information in App variables
+                    App.friends = result.getJSONArray("contacts");
+                    for (int i = 0; i < App.friends.length(); i++) {
+                        JSONObject f = App.friends.getJSONObject(i);
+                        App.names[i] = f.getString("name");
+                        //Hashmap
+                        App.friend_map.put(f.getString("name"),
+                                f.getString("friend_id"));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+            Log.v("db_user_id", App.db_user_id);
         }
 
-        //Mongo DB에서 친구 가져오기
-        //JSONObject request = new JSONObject();
-        //JSONObject friends = new JSONObject();
 
+        return view;
+    }
+
+    public void onResume() {
+        super.onResume();
+        JSONArray contactsjson = new JSONArray();
+        //친구 가져오기
         try {
-            //request.put("type","GET_CONTACTS");
-            //request.put("user_id", App.db_user_id);
-            //friends = new sendJSON("http://52.78.200.87:3000",
-            //        request.toString(), "application/json").execute().get();
-
             if (App.friends == null) {
                 contactsjson.put(new JSONObject("{\"name\" : \"Me\"}"));
             } else {
@@ -99,21 +135,11 @@ public class tab1contacts extends Fragment {
             e.printStackTrace();
         }
 
-        /*
-        try {
-            InputStream contacts = getActivity().getAssets().open("contacts.json");
-            contactsjson = JSONgetContacts(contacts);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-
-
         //Handle ListView
-        ListView conList = (ListView) view.findViewById(R.id.contact_list);
+        ListView conList = (ListView) getView().findViewById(R.id.contact_list);
         ContactViewAdapter adapter = new ContactViewAdapter(getActivity(),
                 R.layout.contact_item, contactsjson);
         conList.setAdapter(adapter);
-        return view;
     }
 
     JSONArray JSONgetContacts (InputStream raw) {
@@ -211,13 +237,14 @@ public class tab1contacts extends Fragment {
 
 
 
-    public void onResume() {
-        super.onResume();
-    }
+    //public void onResume() {
+    //    super.onResume();
+    //}
 
     public boolean isLoggedIn() {
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        return accessToken != null;
+        return getActivity().getSharedPreferences("DB",Context.MODE_PRIVATE).getString("db_id", "") != "";
+        //AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        //return accessToken != null;
     }
 
 

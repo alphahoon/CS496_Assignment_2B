@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -114,6 +115,10 @@ public class LoginPop extends Activity {
                                     result = new sendJSON("http://52.78.200.87:3000",
                                             obj.toString(), "application/json").execute().get();
                                     App.db_user_id = result.getString("user_id");
+                                    SharedPreferences settings = getSharedPreferences("DB",MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = settings.edit();
+                                    editor.putString("db_id", App.db_user_id);
+                                    editor.commit();
 
                                     // Send Device Contact
                                     JSONArray deviceContacts = getDeviceContacts();
@@ -139,6 +144,7 @@ public class LoginPop extends Activity {
                                     for (int i = 0; i < App.friends.length(); i++) {
                                         JSONObject f = App.friends.getJSONObject(i);
                                         App.names[i] = f.getString("name");
+                                        //Hashmap
                                         App.friend_map.put(f.getString("name"),
                                                 f.getString("friend_id"));
                                     }

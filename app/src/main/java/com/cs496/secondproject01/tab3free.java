@@ -7,6 +7,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class tab3free extends Fragment {
@@ -14,6 +18,10 @@ public class tab3free extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.tab3free, container, false);
+
         return view;
     }
+    //public void onResume() {
+     //   super.onResume();
+    //}
 }
