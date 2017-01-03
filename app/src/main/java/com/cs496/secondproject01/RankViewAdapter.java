@@ -19,6 +19,8 @@ import org.json.JSONObject;
 import java.io.InputStream;
 import java.net.URL;
 
+import com.cs496.secondproject01.RoundedImageView;
+
 public class RankViewAdapter extends BaseAdapter {
     public Context context;
     public int resource;
@@ -44,6 +46,7 @@ public class RankViewAdapter extends BaseAdapter {
         // GET VIEWS
         TextView rankNoView = (TextView) convertView.findViewById(R.id.textView_rank_no);
         ImageView rankThumbnailView = (ImageView) convertView.findViewById(R.id.imageView_rank_thumnail);
+        //RoundedImageView circle =
         TextView rankNameView = (TextView) convertView.findViewById(R.id.textView_rank_name);
         TextView rankCountView = (TextView) convertView.findViewById(R.id.textView_rank_count);
 
@@ -56,6 +59,7 @@ public class RankViewAdapter extends BaseAdapter {
             if (jObject.has("pic")) {
                 try {
                     pic = new loadImage().execute(jObject.getString("pic")).get();
+                    pic = RoundedImageView.getCroppedBitmap(pic,150);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

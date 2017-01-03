@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/album_view"
+    android:orientation="vertical">
+
+    <TextView
+        android:text="Album Name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/a_name"
+        android:layout_marginTop="15dp"
+        android:textSize="30dp"
+        android:padding="5dp"
+        android:layout_gravity="center"/>
+
+    <TextView
+        android:text="2017-01-01"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/a_date"
+        android:textSize="20dp"
+        android:paddingRight="@dimen/album_view_left_margin"
+        android:layout_gravity="right"/>
+
+    <TextView
+        android:text="함께한 소중한 인연"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/a_with"
+        android:layout_marginTop="23dp"
+        android:textSize="20dp"
+        android:paddingLeft="@dimen/album_view_left_margin"
+        android:paddingRight="@dimen/album_view_left_margin"
+        android:layout_marginBottom="5dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/b_with"
+        android:text="friends"
+        android:paddingLeft="@dimen/album_view_left_margin_55"
+        android:paddingRight="@dimen/album_view_left_margin"
+        android:layout_marginBottom="15dp"/>
+
+    <TextView
+        android:text="함께한 즐거운 활동"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/a_activity"
+        android:textSize="20dp"
+        android:paddingLeft="@dimen/album_view_left_margin"
+        android:paddingRight="@dimen/album_view_left_margin"
+        android:layout_marginBottom="5dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/b_activity"
+        android:text="activities"
+        android:paddingLeft="@dimen/album_view_left_margin_55"
+        android:paddingRight="@dimen/album_view_left_margin"
+        android:layout_marginBottom="15dp" />
+
+    <TextView
+        android:text="함께한 흔적"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/a_photos"
+        android:textSize="20dp"
+        android:paddingLeft="@dimen/album_view_left_margin"
+        android:paddingRight="@dimen/album_view_left_margin"
+        android:layout_marginBottom="10dp"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/album_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:paddingLeft="@dimen/album_view_left_margin"
+        android:paddingRight="@dimen/album_view_left_margin"
+        android:paddingBottom="35dp">
+    </android.support.v7.widget.RecyclerView>
+</LinearLayout>

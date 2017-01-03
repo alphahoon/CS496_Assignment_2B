@@ -70,6 +70,7 @@ public class ContactViewAdapter extends BaseAdapter {
             if (jObject.has("mobile")) { number = jObject.getString("mobile"); }
             if (jObject.has("pic")) {
                 Bitmap bmp = new loadImage().execute(jObject.getString("pic")).get();
+                bmp = RoundedImageView.getCroppedBitmap(bmp, 150);
                 thumnailView.setImageBitmap(bmp);
             } else {thumnailView.setImageResource(R.drawable.default_profile);}
             // 아이템 내 각 위젯에 데이터 반영

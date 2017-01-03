@@ -40,6 +40,7 @@
         android:id="@+id/listView_rank_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="40dp"/>
+        android:paddingTop="10dp"
+        android:paddingBottom="0dp"/>
 
 </LinearLayout>

@@ -56,17 +56,17 @@ import java.util.concurrent.ExecutionException;
 
 public class AddBoxPop extends Activity {
     private ArrayList<Integer> cards =
-            new ArrayList<Integer>(Arrays.asList(R.drawable.card0,R.drawable.card1,R.drawable.card2,
-                                                R.drawable.card3,R.drawable.card4,R.drawable.card5,
-                                                R.drawable.card6,R.drawable.card7));
+            new ArrayList<Integer>(Arrays.asList(R.drawable.card0, R.drawable.card1, R.drawable.card2,
+                    R.drawable.card3, R.drawable.card4, R.drawable.card5,
+                    R.drawable.card6, R.drawable.card7));
 
 
     public final static int REQUEST_CODE = 1;
     private Button getphoto;
     public static ArrayList<String> selectedPhotos = new ArrayList<>();
     private String date;
-
-
+    public MultiAutoCompleteTextView mt;
+    public String[] names = {};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +88,7 @@ public class AddBoxPop extends Activity {
         Button b_complete = (Button) findViewById(R.id.complete);
         Button b_photo = (Button) findViewById(R.id.select_photos);
         Button b_date = (Button) findViewById(R.id.select_date);
+        mt = (MultiAutoCompleteTextView) findViewById(R.id.with_input);
         txt0.setTypeface(App.myFont);
         txt1.setTypeface(App.myFont);
         txt2.setTypeface(App.myFont);
@@ -117,7 +118,7 @@ public class AddBoxPop extends Activity {
             @Override
             public void onClick(View v) {
                 DatePickerDialog dialog = new DatePickerDialog(AddBoxPop.this,
-                        listener, year,month,day);
+                        listener, year, month, day);
                 dialog.show();
             }
         });
@@ -138,7 +139,11 @@ public class AddBoxPop extends Activity {
         });
 
         // Select With Friends
-        String[] names = App.names;
+        names = App.names;
+        //names = new String[]{"Yeaseul Park1", "Yeaseul Park2","Yeaseul Park3","Yeaseul Park4","Yeaseul Park5","Yeaseul Park6","Jaehoon Lee", "이재훈", "박예슬", "TEST", "test user"};
+        mt.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+        mt.setThreshold(3);
+
         /*ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_dropdown_item_1line, names);
         MultiAutoCompleteTextView with_input = (MultiAutoCompleteTextView) findViewById(R.id.with_input);
@@ -147,24 +152,26 @@ public class AddBoxPop extends Activity {
         with_input.setThreshold(1);
         with_input.setAdapter(adapter);*/
 
-        final MultiAutoCompleteTextView mt=(MultiAutoCompleteTextView)
-                findViewById(R.id.with_input);
+        /*
+        final MultiAutoCompleteTextView mt = (MultiAutoCompleteTextView) findViewById(R.id.with_input);
         mt.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
-
-        ArrayAdapter<String> adp=new ArrayAdapter<String>(this,
-                android.R.layout.simple_dropdown_item_1line,names);
-
+        ArrayAdapter<String> mt_adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, names);
         mt.setThreshold(1);
-        mt.setAdapter(adp);
-/*
+        mt.setAdapter(mt_adapter);
+        */
+
+
+
         mt.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event)
             {
-                mt.showDropDown();
+                if (names.length > 0)
+                    mt.showDropDown();
                 return true;
             }
-        });*/
+        });
+
 
         //"상자에 추가하기" button
         Button complete = (Button) findViewById(R.id.complete);
@@ -177,6 +184,17 @@ public class AddBoxPop extends Activity {
         int width = dm.widthPixels;
         int height = dm.heightPixels;
         getWindow().setLayout((int) (width * 0.8), (int) (height * 0.72));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ArrayAdapter<String> mt_adapter = new ArrayAdapter<String>(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                names
+        );
+        mt.setAdapter(mt_adapter);
     }
 
     //============================================================================================//
@@ -194,7 +212,6 @@ public class AddBoxPop extends Activity {
                 selectedPhotos.addAll(photos);
             }
 
-
             // start image viewer
             //Intent startActivity = new Intent(this , PhotoPagerActivity.class);
             //startActivity.putStringArrayListExtra("photos" , selectedPhotos);
@@ -205,9 +222,9 @@ public class AddBoxPop extends Activity {
     private DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-            String msg = year + "-" + monthOfYear+1 + "-" + dayOfMonth;
+            String msg = year + "-" + monthOfYear + 1 + "-" + dayOfMonth;
             if (dayOfMonth < 10)
-                msg = year + "-" + monthOfYear+1 + "-0" + dayOfMonth;
+                msg = year + "-" + monthOfYear + 1 + "-0" + dayOfMonth;
             date = msg;
             Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
         }
@@ -229,12 +246,12 @@ public class AddBoxPop extends Activity {
 
                 Bitmap bitmap = BitmapFactory.decodeFile(filePath);
                 //bitmap = Bitmap.createScaledBitmap(bitmap, dstWidth, dstHeight, true);
-                Log.v("bitmap",bitmap.toString());
-                ByteArrayOutputStream ByteStream= new  ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG,20, ByteStream);
-                byte [] b=ByteStream.toByteArray();
-                String encoded =Base64.encodeToString(b, Base64.NO_WRAP);
-                encoded = "data:image/jpeg;base64,"+encoded;
+                Log.v("bitmap", bitmap.toString());
+                ByteArrayOutputStream ByteStream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 20, ByteStream);
+                byte[] b = ByteStream.toByteArray();
+                String encoded = Base64.encodeToString(b, Base64.NO_WRAP);
+                encoded = "data:image/jpeg;base64," + encoded;
 
                 Log.v("encoded", encoded);
 
@@ -261,22 +278,21 @@ public class AddBoxPop extends Activity {
                 //bitmap = Bitmap.createScaledBitmap(bitmap,parent.getWidth(),parent.getHeight(),true);
             }
 
-
             //날짜 받아오기
             Button getDate = (Button) findViewById(R.id.select_date);
-
-
 
             //앨범 이름 받아오기
             EditText album_name = (EditText) findViewById(R.id.album_name);
             String album = album_name.getText().toString();
 
             //친구 태그 가져오기
-            MultiAutoCompleteTextView with_input = (MultiAutoCompleteTextView) findViewById(R.id.with_input);
-            String s = with_input.getText().toString();
+            String s = mt.getText().toString();
+            if (s.endsWith(", "))
+                s = s.substring(0, s.length() - 2);
             String[] friendNames = s.split(",");
+
             JSONArray friend_ids = new JSONArray();
-            for (int i = 0; i < friendNames.length ; i++)
+            for (int i = 0; i < friendNames.length; i++)
                 friend_ids.put(App.friend_map.get(friendNames[i].trim()));
 
 
@@ -291,14 +307,14 @@ public class AddBoxPop extends Activity {
             CheckBox b_ex = (CheckBox) findViewById(R.id.ex_box);
             JSONObject activity = new JSONObject();
             try {
-                activity.put("work",bool2int(b_work.isChecked()));
-                activity.put("study",bool2int(b_study.isChecked()));
-                activity.put("food",bool2int(b_eat.isChecked()));
-                activity.put("cafe",bool2int(b_coffee.isChecked()));
-                activity.put("sports",bool2int(b_ex.isChecked()));
-                activity.put("game",bool2int(b_game.isChecked()));
-                activity.put("travel",bool2int(b_travel.isChecked()));
-                activity.put("movie",bool2int(b_movie.isChecked()));
+                activity.put("work", bool2int(b_work.isChecked()));
+                activity.put("study", bool2int(b_study.isChecked()));
+                activity.put("food", bool2int(b_eat.isChecked()));
+                activity.put("cafe", bool2int(b_coffee.isChecked()));
+                activity.put("sports", bool2int(b_ex.isChecked()));
+                activity.put("game", bool2int(b_game.isChecked()));
+                activity.put("travel", bool2int(b_travel.isChecked()));
+                activity.put("movie", bool2int(b_movie.isChecked()));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -307,12 +323,12 @@ public class AddBoxPop extends Activity {
             try {
                 JSONObject req = new JSONObject();
                 req.put("type", "CREATE_ALBUM");
-                req.put("user_id",App.db_user_id);
-                req.put("album_name",album);
-                req.put("date",date);
-                req.put("activity",activity);
-                req.put("friend_id_list",friend_ids);
-                req.put("img_id_list",photos);
+                req.put("user_id", App.db_user_id);
+                req.put("album_name", album);
+                req.put("date", date);
+                req.put("activity", activity);
+                req.put("friend_id_list", friend_ids);
+                req.put("img_id_list", photos);
                 JSONObject result = new sendJSON("http://52.78.200.87:3000",
                         req.toString(), "application/json").execute().get();
                 Log.v("create album", result.toString());
@@ -337,6 +353,7 @@ public class AddBoxPop extends Activity {
         String s = (bool) ? "1" : "0";
         return s;
     }
+
     //============================================================================================//
     // AsyncTask to send JSON to our MongoDB
     private class sendJSON extends AsyncTask<Void, Void, JSONObject> {

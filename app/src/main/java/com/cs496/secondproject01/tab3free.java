@@ -39,18 +39,19 @@ public class tab3free extends Fragment {
     public static final int MODE_ACTIVITY = 0;
     public static final int MODE_FRIEND = 1;
 
-    public static final String DEFAULT_IMG_URL = "https://www.thesocialmediahat.com/sites/default/files/default_profile_4.png";
+
+    public static final String DEFAULT_IMG_URL = "https://scontent.xx.fbcdn.net/v/t1.0-1/c15.0.50.50/p50x50/10354686_10150004552801856_220367501106153455_n.jpg?oh=61d2ef0908c4e9ea88e64dcd066685fb&oe=58E9C72F";
     public static final String[] ACTIVITY_LIST = {
             "work", "study", "food", "cafe", "sports", "movie", "game", "travel"};
     public static final String[] ACTIVITY_URLS = {
-            "https://www.thesocialmediahat.com/sites/default/files/default_profile_4.png",  // work
-            "https://www.thesocialmediahat.com/sites/default/files/default_profile_4.png",  // study
-            "https://www.thesocialmediahat.com/sites/default/files/default_profile_4.png",  // food
-            "https://www.thesocialmediahat.com/sites/default/files/default_profile_4.png",  // cafe
-            "https://www.thesocialmediahat.com/sites/default/files/default_profile_4.png",  // sports
-            "https://www.thesocialmediahat.com/sites/default/files/default_profile_4.png",  // movie
-            "https://www.thesocialmediahat.com/sites/default/files/default_profile_4.png",  // game
-            "https://www.thesocialmediahat.com/sites/default/files/default_profile_4.png"   // travel
+            "http://52.78.200.87:3000/static/colors/grey.png",  // work
+            "http://52.78.200.87:3000/static/colors/green.png",  // study
+            "http://52.78.200.87:3000/static/colors/orange.png",  // food
+            "http://52.78.200.87:3000/static/colors/pink.png",  // cafe
+            "http://52.78.200.87:3000/static/colors/blue.png",  // sports
+            "http://52.78.200.87:3000/static/colors/purple.png",  // movie
+            "http://52.78.200.87:3000/static/colors/yellow.png",  // game
+            "http://52.78.200.87:3000/static/colors/cyan.png"   // travel
     };
 
 
@@ -60,6 +61,8 @@ public class tab3free extends Fragment {
         btnRankActivity = (Button) view.findViewById(R.id.btn_rank_activity);
         btnRankFriends = (Button) view.findViewById(R.id.btn_rank_friends);
         listViewRank = (ListView) view.findViewById(R.id.listView_rank_list);
+        //btnRankActivity.setTypeface(App.myFont);
+        //btnRankFriends.setTypeface(App.myFont);
 
         btnRankActivity.setOnClickListener(btnRankActivityOnClicked);
         btnRankFriends.setOnClickListener(btnRankFriendsOnClicked);
@@ -106,6 +109,7 @@ public class tab3free extends Fragment {
     }
 
     public JSONArray getRankList (int mode) {
+        JSONArray rankList = new JSONArray();
         try {
             // GENERATE REQUEST
             JSONObject req = new JSONObject();
@@ -124,7 +128,7 @@ public class tab3free extends Fragment {
 
             // PARSE RESPONSE TO GET RANKLIST
             JSONObject tmp;
-            JSONArray rankList = new JSONArray();
+            rankList = new JSONArray();
             switch (mode)
             {
                 // FOR ACTIVITY RANK TAB
@@ -173,10 +177,11 @@ public class tab3free extends Fragment {
                         }
                         tmp.put("name", friend.get("name"));
                         tmp.put("count", friend.get("count"));
+                        rankList.put(tmp);
                     }
                     break;
             }
-
+            Log.e("rankList", rankList.toString());
             // SORT JSON ARRAY BASED ON THE NUMBER OF COUNT
             JSONArray sortedRankList = new JSONArray();
             List<JSONObject> jsonValues = new ArrayList<>();
@@ -189,6 +194,18 @@ public class tab3free extends Fragment {
 
                 @Override
                 public int compare(JSONObject a, JSONObject b) {
+                    int a_count = 0;
+                    int b_count = 0;
+                    try{
+                        a_count = Integer.parseInt((String) a.get(KEY_NAME));
+                        b_count = Integer.parseInt((String) b.get(KEY_NAME));
+                        Log.e(String.valueOf(a_count), String.valueOf(b_count));
+                        //
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    return a_count > b_count ? -1 : 1;
+                    /*
                     String valA = new String();
                     String valB = new String();
                     try {
@@ -197,18 +214,21 @@ public class tab3free extends Fragment {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    return valA.compareTo(valB);
+                    return valB.compareTo(valA);
                     //if you want to change the sort order, simply use the following:
                     //return -valA.compareTo(valB);
+                    */
                 }
             });
             for (int i = 0; i < rankList.length(); i++)
                 sortedRankList.put(jsonValues.get(i));
 
             // PUT RANK FIELD WITH VALUE START FROM 1
+            rankList = new JSONArray();
             for (int i = 0; i < sortedRankList.length(); i++) {
                 tmp = sortedRankList.getJSONObject(i);
                 tmp.put("rank", String.valueOf(i + 1));
+                rankList.put(tmp);
             }
         } catch (Exception e) {
             e.printStackTrace();

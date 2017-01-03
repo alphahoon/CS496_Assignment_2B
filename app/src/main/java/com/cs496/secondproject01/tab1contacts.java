@@ -78,7 +78,7 @@ public class tab1contacts extends Fragment {
 */
 
         if (!isLoggedIn()) {
-            //if (true) {
+        //if (true) {
             //LoginButton loginButton = (LoginButton) view.findViewById(R.id.login_button);
             //loginButton.setVisibility(View.INVISIBLE);
             //App.firstAccess = false;

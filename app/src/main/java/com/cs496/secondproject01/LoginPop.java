@@ -76,27 +76,17 @@ public class LoginPop extends Activity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         cbmanager = CallbackManager.Factory.create();
         mToken = AccessToken.getCurrentAccessToken();
+        requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 1000);
+        requestPermissions(new String[]{Manifest.permission.CALL_PHONE}, 1001);
 
+        TextView t = (TextView) findViewById(R.id.logintext);
+        t.setTypeface(App.myFont);
         LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
         loginButton.setReadPermissions("public_profile", "user_friends", "email");
         loginButton.registerCallback(cbmanager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(final LoginResult loginResult) {
 
-                //sendPOST getFBContacts;
-               /* JSONObject friends = null;
-                String graphURL = "https://graph.facebook.com/v2.8/" +loginResult.getAccessToken().getUserId()+"/"+"taggable_friends?limit=500&access_token="+loginResult.getAccessToken().getToken();
-                try {
-                    friends = new getJSON(graphURL,"","text/plain").execute().get();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-                new sendJSON("http://52.78.200.87:3000",
-                        friends.toString(), "application/json").execute();
-                setResult(RESULT_OK);
-                */
                 GraphRequest request;
                 mToken = loginResult.getAccessToken();
                 request = GraphRequest.newMeRequest(mToken,
@@ -107,19 +97,6 @@ public class LoginPop extends Activity {
                                 JSONObject result = new JSONObject();
 
                                 try {
-                                    // Create new Database for this user
-                                    obj.put("type", "NEW_USER");
-                                    obj.put("name", user.getString("name"));
-                                    obj.put("email", user.getString("email"));
-                                    //App.userFBinfo = user;
-                                    result = new sendJSON("http://52.78.200.87:3000",
-                                            obj.toString(), "application/json").execute().get();
-                                    App.db_user_id = result.getString("user_id");
-                                    SharedPreferences settings = getSharedPreferences("DB",MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = settings.edit();
-                                    editor.putString("db_id", App.db_user_id);
-                                    editor.commit();
-
                                     // Send Device Contact
                                     JSONArray deviceContacts = getDeviceContacts();
                                     obj = new JSONObject();
@@ -128,6 +105,21 @@ public class LoginPop extends Activity {
                                     obj.put("contacts", deviceContacts);
                                     new sendJSON("http://52.78.200.87:3000",
                                             obj.toString(), "application/json").execute();
+
+                                    // Create new Database for this user
+                                    obj.put("type", "NEW_USER");
+                                    obj.put("name", user.getString("name"));
+                                    obj.put("email", user.getString("email"));
+                                    //App.userFBinfo = user;
+                                    result = new sendJSON("http://52.78.200.87:3000",
+                                            obj.toString(), "application/json").execute().get();
+                                    if (result.getString("result").contains("success")) {
+                                        App.db_user_id = result.getString("user_id");
+                                        SharedPreferences settings = getSharedPreferences("DB", MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = settings.edit();
+                                        editor.putString("db_id", App.db_user_id);
+                                        editor.commit();
+                                    }
 
                                     // Send Facebook Contact
                                     sendFBcontacts(user.getJSONObject("taggable_friends"));
@@ -186,7 +178,7 @@ public class LoginPop extends Activity {
         getWindowManager().getDefaultDisplay().getMetrics(dm);
         int width = dm.widthPixels;
         int height = dm.heightPixels;
-        getWindow().setLayout((int) (width * 0.7), (int) (height * 0.4));
+        getWindow().setLayout((int) (width * 0.6), (int) (height * 0.3));
         getWindow().setBackgroundDrawable(new ColorDrawable(0xb0000000));
         //RelativeLayout back_dim_layout = (RelativeLayout) findViewById(R.id.bac_dim_layout);
         //getLayoutInflater().inflate(R.layout.popup_dim_effect,null);
@@ -319,10 +311,9 @@ public class LoginPop extends Activity {
 
     public JSONArray getDeviceContacts() {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 1000);
-            requestPermissions(new String[]{Manifest.permission.CALL_PHONE}, 1000);
-        }
+
+        requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, 1000);
+        requestPermissions(new String[]{Manifest.permission.CALL_PHONE}, 1001);
         Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
 
         String[] projection = new String[]{

@@ -24,7 +24,7 @@
 
             <TextView
                 android:id="@+id/textview"
-                android:text="album name"
+                android:text="Create Your Own Album!"
                 android:textSize="20dp"
                 android:gravity="center|left"
                 android:layout_width="match_parent"

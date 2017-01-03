@@ -2,11 +2,14 @@ package com.cs496.secondproject01;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,6 +44,7 @@ import static java.security.AccessController.getContext;
 public class AlbumViewAdapter extends RecyclerView.Adapter<AlbumViewAdapter.ViewHolder> {
     private JSONArray album_list;
     private Context context;
+    public Fragment f;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -51,6 +55,7 @@ public class AlbumViewAdapter extends RecyclerView.Adapter<AlbumViewAdapter.View
         public TextView mTextView;
         public TextView mTextView2;
         public ImageView delete;
+        public CardView card;
 
         public ViewHolder(View view) {
             super(view);
@@ -58,12 +63,14 @@ public class AlbumViewAdapter extends RecyclerView.Adapter<AlbumViewAdapter.View
             mTextView = (TextView) view.findViewById(R.id.textview);
             mTextView2 = (TextView) view.findViewById(R.id.textview2);
             delete = (ImageView) view.findViewById(R.id.delete);
+            card = (CardView) view.findViewById(R.id.cardview);
         }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public AlbumViewAdapter(FragmentActivity activity, JSONArray list) {
+    public AlbumViewAdapter(FragmentActivity activity, Fragment f, JSONArray list) {
         this.context = activity;
+        this.f = f;
         this.album_list = list;
     }
 
@@ -89,7 +96,7 @@ public class AlbumViewAdapter extends RecyclerView.Adapter<AlbumViewAdapter.View
                 req.put("type", "GET_ALBUM");
                 req.put("user_id", App.db_user_id);
                 req.put("album_id", album_list.getString(position));
-                JSONObject result = new sendJSON("http://52.78.200.87:3000",
+                final JSONObject result = new sendJSON("http://52.78.200.87:3000",
                         req.toString(), "application/json").execute().get();
                 Bitmap thumnail = new loadImage().execute(result.getJSONArray("img_url_list").getString(0)).get();
                 holder.mTextView.setText(result.getString("album_name"));
@@ -116,6 +123,7 @@ public class AlbumViewAdapter extends RecyclerView.Adapter<AlbumViewAdapter.View
                                     Log.v("deleted album",result.toString());
                                     if (result.getString("result").contains("success"))
                                         Toast.makeText(context, "추억 삭제 완료", Toast.LENGTH_SHORT).show();
+                                    f.onResume();
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 } catch (InterruptedException e) {
@@ -126,6 +134,14 @@ public class AlbumViewAdapter extends RecyclerView.Adapter<AlbumViewAdapter.View
                             }
                         });
                         ad.create().show();
+                    }
+                });
+                holder.card.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(context, AlbumView.class);
+                        intent.putExtra("album",result.toString());
+                        context.startActivity(intent);
                     }
                 });
             } catch (JSONException e) {

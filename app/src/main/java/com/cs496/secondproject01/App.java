@@ -1,5 +1,6 @@
 package com.cs496.secondproject01;
 
+import android.Manifest;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
@@ -43,6 +44,7 @@ public class App extends Application {
         AppEventsLogger.activateApp(this);
         //LoginManager.getInstance().logOut();
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitNetwork().build());
+
         myFont = Typeface.createFromAsset(getAssets(), "fonts/pen.ttf");
         super.onCreate();
         firstAccess = true;

@@ -1,23 +1,22 @@
 package com.cs496.secondproject01;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.facebook.login.widget.LoginButton;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,51 +31,66 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * Created by q on 2017-01-03.
+ */
 
-public class tab2gallery extends Fragment {
-    private RecyclerView mRecyclerView;
-    private AlbumViewAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private JSONObject result;
-    private JSONArray list;
+public class PhotoViewAdapter extends RecyclerView.Adapter<PhotoViewAdapter.ViewHolder> {
+    private JSONArray photo_list;
+    private Context context;
 
+    // Provide a reference to the views for each data item
+    // Complex data items may need more than one view per item, and
+    // you provide access to all the views for a data item in a view holder
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        // each data item is just a string in this case
+        public ImageView mImageView;
+        public CardView card;
+
+        public ViewHolder(View view) {
+            super(view);
+            mImageView = (ImageView) view.findViewById(R.id.photo);
+            card = (CardView) view.findViewById(R.id.cardview);
+        }
+    }
+
+    // Provide a suitable constructor (depends on the kind of dataset)
+    public PhotoViewAdapter(Context activity, JSONArray list) {
+        this.context = activity;
+        this.photo_list = list;
+    }
+
+    // Create new views (invoked by the layout manager)
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.tab2gallery, container, false);
+    public PhotoViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        // create a new view
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.photo_card, parent, false);
 
-
-        FloatingActionButton fb = (FloatingActionButton) view.findViewById(R.id.add);
-        fb.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent popupIntent = new Intent(getActivity(), AddBoxPop.class);
-                startActivity(popupIntent);
-            }
-        });
-
-        return view;
+        // set the view's size, margins, paddings and layout parameters
+        ViewHolder vh = new ViewHolder(v);
+        return vh;
     }
 
-    public void onResume() {
-        super.onResume();
-        loadAlbum();
-    }
+    // Replace the contents of a view (invoked by the layout manager)
+    @Override
+    public void onBindViewHolder(ViewHolder holder, final int position) {
+        // - get element from your dataset at this position
+        // - replace the contents of the view with that element
 
-
-    public void loadAlbum() {
         try {
-            JSONObject req = new JSONObject();
-            req.put("type", "GET_ALBUM_LIST");
-            req.put("user_id",App.db_user_id);
-            result = new sendJSON("http://52.78.200.87:3000",
-                    req.toString(), "application/json").execute().get();
-            Log.v("get album tab",result.toString());
-            list = result.getJSONArray("album_id_list");
+            final String url = photo_list.getString(position);
+            Bitmap img = new loadPhoto().execute(url).get();
+            holder.mImageView.setImageBitmap(img);
+            holder.mImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent photoIntent = new Intent(context, FullScreenPop.class);
+                    photoIntent.putExtra("url", url);
+                    context.startActivity(photoIntent);
+                }
+            });
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -84,17 +98,37 @@ public class tab2gallery extends Fragment {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
+    }
 
-        mRecyclerView = (RecyclerView) getView().findViewById(R.id.recyclerview);
-        mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.scrollToPosition(0);
-        mAdapter = new AlbumViewAdapter(getActivity(), tab2gallery.this, list);
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+    // Return the size of your dataset (invoked by the layout manager)
+    @Override
+    public int getItemCount() {
+        if (photo_list == null) {return 0;}
+        return photo_list.length();
+    }
+
+    private class loadPhoto extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public loadPhoto () { }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
     }
     //============================================================================================//
+
+
     // AsyncTask to send JSON to our MongoDB
     private class sendJSON extends AsyncTask<Void, Void, JSONObject> {
         String urlstr;
@@ -168,3 +202,7 @@ public class tab2gallery extends Fragment {
     }
     //============================================================================================//
 }
+
+
+
+
